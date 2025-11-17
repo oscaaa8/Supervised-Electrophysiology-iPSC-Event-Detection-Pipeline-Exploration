@@ -1,6 +1,5 @@
 # Unsupervised Wavelet-Based Neural Event Detector  
-### DSP • Machine Learning • Patch-Clamp Electrophysiology
-Neural Signal Processing • Machine Learning • Electrophysiology Analysis
+### Neural Signal Processing • Machine Learning • Electrophysiology Analysis
 
 This project implements a data-driven, interpretable, and largely unsupervised pipeline for classifying synaptic inhibitory postsynaptic currents (IPSCs) in patch-clamp electrophysiology data.
 
