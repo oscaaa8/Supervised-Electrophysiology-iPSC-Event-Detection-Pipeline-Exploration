@@ -3,101 +3,101 @@ Neural Signal Processing • Machine Learning • Electrophysiology Analysis
 
 This project implements a data-driven, interpretable, and largely unsupervised pipeline for classifying synaptic inhibitory postsynaptic currents (IPSCs) in patch-clamp electrophysiology data.
 
-The goal:
-
-Identify waveform features that distinguish true synaptic events from noise without relying on vision or manually created labels.
+The goal is to identify waveform features that distinguish true synaptic events from noise without relying on vision or manually created labels.
 
 This project combines digital signal processing (DSP), wavelet decomposition, feature engineering, and machine learning to reveal meaningful structure in neural signals.
 
-🔍 Overview of the Approach
-1. Initial Peak Detection (Rule-Based)
+---
 
-Amplitude threshold (delta)
+## Overview of the Approach
 
-Slope threshold (slope_thresh)
+### 1. Initial Peak Detection (Rule-Based)
 
-Minimum inter-event distance (distance)
+Candidate peaks were selected from raw electrophysiology recordings using:
+- Amplitude threshold (`delta`)
+- Slope threshold (`slope_thresh`)
+- Minimum inter-event distance (`distance`)
 
-This produces candidate “events” from raw electrophysiology recordings.
+This produced a set of candidate “events” for further analysis.
 
-2. Wavelet Decomposition (db4)
+---
 
-Each candidate waveform is decomposed into multiple frequency bands:
+### 2. Wavelet Decomposition (db4)
 
-D1: highest-frequency detail
+Each candidate waveform was decomposed into multiple frequency bands:
 
-D2, D3: progressively smoother detail layers
+- D1: highest-frequency detail  
+- D2/D3: progressively smoother detail layers  
+- A3: low-frequency approximation  
 
-A3: low-frequency approximation
+Wavelet coefficients served as the foundation for downstream feature extraction.
 
-Wavelet coefficients form the basis for all downstream features.
+---
 
-3. Feature Engineering
+### 3. Feature Engineering
 
-For each wavelet level (L0–L3), features include:
+For each wavelet level (L0–L3), the following features were computed:
 
-Energy
+- Energy  
+- Standard deviation  
+- Maximum and minimum  
+- Kurtosis  
+- Skewness  
+- Zero-crossings  
+- Entropy  
+- Slope  
 
-Standard deviation
+Additionally, several interaction features were engineered, such as:
+- `L0_slope_by_energy`
+- `L3_energy_x_L3_min`
+- `L0_slope_minus_L1_std`
 
-Max/min
+Elastic Net regression was used to identify the most informative subset of features.
 
-Kurtosis
+---
 
-Skewness
+### 4. Unsupervised Clustering
 
-Zero-crossings
+KMeans clustering was performed on the engineered feature space.
 
-Entropy
+Visualization with PCA showed meaningful separation between event and non-event categories.
 
-Slope
+Cluster 1 consistently mapped to true synaptic events.
 
-Interaction features (e.g., L0_slope_by_energy, L3_energy_x_L3_min)
+Performance metrics:
+- Precision: 0.806  
+- Recall: 0.649  
+- F1 Score: 0.719  
 
-Elastic Net regression identifies the most informative subset.
+This represents a significant improvement over the initial threshold detector (F1 = 0.49).
 
-4. Unsupervised Clustering
+---
 
-KMeans on a reduced feature space
+### 5. Supervised Sanity Checks
 
-Visualized using PCA
+To validate that the engineered features were informative, several supervised models were tested:
 
-Cluster 1 consistently maps to true synaptic events
+- Random Forest  
+- Support Vector Machine (SVM)  
+- Logistic Regression  
 
-Achieved:
+The SVM model reached 0.77 accuracy on balanced labels, confirming that the feature set captured discriminative structure.
 
-Precision: 0.806
+---
 
-Recall: 0.649
+## Key Results
 
-F1 score: 0.719
+- Wavelet-based features captured biologically meaningful distinctions in IPSC waveform shape.
+- Elastic Net identified several high-value features, including:
+  - `L0_slope`  
+  - `L3_energy`  
+  - `L3_min`
+- Feature engineering improved the KMeans F1 score from 0.49 to 0.72.
+- PCA showed clear separation after feature selection.
 
-This significantly improves over the raw threshold detector (F1 = 0.49).
+---
 
-5. Supervised Sanity Checks
+## Documentation
 
-To validate that engineered features are informative:
+The full project report is available in the repository:
 
-Random Forest
-
-SVM
-
-Logistic Regression
-
-SVM reached 0.77 accuracy on balanced labels.
-
-📈 Key Results
-
-Wavelet-based features capture biologically meaningful distinctions in IPSC shape.
-
-Elastic Net highlights several powerful features:
-
-L0_slope (sharpness)
-
-L3_energy (structure of slower components)
-
-L3_min (amplitude/polarity)
-
-KMeans + feature engineering improves F1 score from 0.49 → 0.72.
-
-Clear separability in PCA after proper feature selectio
